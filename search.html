@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Eldorado 行情查询控制台</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f4f4f4; }
+        .form-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 150px; font-weight: bold; }
+        select, input { padding: 5px; width: 300px; font-family: monospace; }
+        button { padding: 10px 20px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #output { background: #1e1e1e; color: #00ff00; padding: 15px; white-space: pre-wrap; margin-top: 20px; border: 1px solid #000; min-height: 200px; overflow-x: auto; }
+        .section { background: white; padding: 20px; border: 1px solid #ccc; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🛒 Eldorado 自动化查价与上架终端</h1>
+    <div class="section">
+        <h3>🔑 1. 账号授权信息</h3>
+        <div class="form-group">
+            <label>登录邮箱:</label>
+            <input type="text" id="username" placeholder="输入你的 Eldorado 邮箱">
+        </div>
+        <div class="form-group">
+            <label>登录密码:</label>
+            <input type="password" id="password" placeholder="输入你的密码">
+        </div>
+    </div>
+    <div class="section">
+        <h3>📦 2. 目标商品设定 (级联选择)</h3>
+        <div class="form-group">
+            <label>Rarity (稀有度):</label>
+            <select id="raritySelect" onchange="onRarityChange()">
+                <option value="">-- 请选择稀有度 --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Item (具体物品):</label>
+            <select id="itemSelect" onchange="updatePayloadPreview()">
+                <option value="">-- 请先选择稀有度 --</option>
+            </select>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label>M/s (移速属性):</label>
+            <select id="msSelect" onchange="updatePayloadPreview()">
+                <option value="">-- 不限 (查全部) --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Mutations (变异):</label>
+            <select id="mutationSelect" onchange="updatePayloadPreview()">
+                <option value="">-- 不限 (查全部) --</option>
+            </select>
+        </div>
+    </div>
+    <div class="section">
+        <h3>🚀 3. 执行操作</h3>
+        <button onclick="checkMarketPrice()">📡 查询市场行情 (粗查+精筛)</button>
+        <p style="color: gray; font-size: 12px;">提示：请确保后端 Node.js 服务 (端口 6675) 正在运行中。</p>
+    </div>
+    <div class="section">
+        <h3>🖥️ 控制台输出</h3>
+        <div id="output">等待操作...</div>
+    </div>
+    <script>
+        // ==========================================
+        // 字典数据 (从抓包逆向分析中提取)
+        // ==========================================
+        const brainrotDictionary = {
+            "Common": { "Other": "0-0-0" },
+            "Rare": { "Other": "0-1-0" },
+            "Epic": { "Other": "0-2-0" },
+            "Legendary": { "Other": "0-3-0" },
+            "Mythical": { "Frigo Camelo": "0-4-0", "Orangutini Ananassini": "0-4-1", "Bombardiro Crocodilo": "0-4-2", "Bombombini Gusini": "0-4-3", "Te Te Te Sahur": "0-4-4", "Other": "0-4-5" },
+            "Brainrot God": { "Cocofanto Elefanto": "0-5-0", "Girafa Celestre": "0-5-1", "Tralalero Tralala": "0-5-2", "Los Crocodillitos": "0-5-3", "Tigroligre Frutonni": "0-5-4", "Odin Din Din Dun": "0-5-5", "Orcalero Orcala": "0-5-6", "Tralalita Tralala": "0-5-7", "Trenostruzzo Turbo 3000": "0-5-8", "Trippi Troppi Troppa Trippa": "0-5-9", "Ballerino Lololo": "0-5-10", "Bulbito Bandito Traktorito": "0-5-11", "Los Tungtungtungcitos": "0-5-12", "Pakrahmatmamat": "0-5-13", "Piccione Macchina": "0-5-14", "Los Orcalitos": "0-5-15", "Tartaruga Cisterna": "0-5-16", "Brainrot God Lucky Block": "0-5-17", "Alessio": "0-5-18", "Los Bombinitos": "0-5-19", "Matteo": "0-5-20", "Espresso Signora": "0-5-21", "Urubini Flamenguini": "0-5-22", "Statutino Libertino": "0-5-23", "Tipi Topi Taco": "0-5-24", "Bombardini Tortini": "0-5-25", "Other": "0-5-26", "Buho de Noelo": "0-5-27", "Chrismasmamat": "0-5-28", "Cocoa Assassino": "0-5-29", "Pandanini Frostini": "0-5-30", "Boba Panda": "0-5-31", "Dolphini Jetskini": "0-5-32", "Luv Luv Luv": "0-5-33", "Karkerheart Luvkur": "0-5-34" },
+            "Secret": { "Los Matteos": "0-6-0", "Bisonte Giuppitere": "0-6-1", "La Vacca Saturno Saturnita": "0-6-2", "Torrtuginni Dragonfrutini": "0-6-3", "Agarrini La Palini": "0-6-4", "Los Tralaleritos": "0-6-5", "Las Tralaleritas": "0-6-6", "Job Job Job Sahur": "0-6-7", "Las Vaquitas Saturnitas": "0-6-8", "Graipuss Medussi": "0-6-9", "La Sahur Combinasion": "0-6-10", "Pot Hotspot": "0-6-11", "Chicleteira Bicicleteira": "0-6-12", "La Grande Combinasion": "0-6-13", "Los Combinasionas": "0-6-14", "Nuclearo Dinossauro": "0-6-15", "La Karkerkar Combinasion": "0-6-16", "Los Hotspotsitos": "0-6-17", "Tralaledon": "0-6-18", "Esok Sekolah": "0-6-19", "Ketupat Kepat": "0-6-20", "Los Bros": "0-6-21", "La Supreme Combinasion": "0-6-22", "Ketchuru and Musturu": "0-6-23", "Garama and Madundung": "0-6-24", "Spaghetti Tualetti": "0-6-25", "Dragon Cannelloni": "0-6-26", "Secret Lucky Block": "0-6-27", "Blackhole Goat": "0-6-28", "Los Spyderinis": "0-6-29", "Guerriro Digitale": "0-6-30", "Karkerkar Kurkur": "0-6-31", "Sammyni Spyderini": "0-6-32", "Dul Dul Dul": "0-6-33", "Chimpanzini Spiderini": "0-6-34", "Nooo My Hotspot": "0-6-35", "Other": "0-6-36", "Extinct Matteo": "0-6-37", "La Extinct Grande": "0-6-38", "Los Chicleteiras": "0-6-39", "67": "0-6-40", "Las Sis": "0-6-41", "Tictac Sahur": "0-6-42", "Money Money Puggy": "0-6-43", "To to to Sahur": "0-6-44", "Tacorita Bicicleta": "0-6-45", "Mariachi Corazoni": "0-6-46", "Los Primos": "0-6-47", "Los Tacoritas": "0-6-48", "La Spooky Grande": "0-6-49", "Los Mobilis": "0-6-50", "Los 67": "0-6-51", "Eviledon": "0-6-52", "Spooky and Pumpky": "0-6-53", "Mieteteira Bicicleteira": "0-6-54", "Chillin Chili": "0-6-55", "Tang Tang Keletang": "0-6-56", "La Secret Combinasion": "0-6-57", "La Casa Boo": "0-6-58", "Burrito Bandito": "0-6-59", "Chipso and Queso": "0-6-60", "Burguro and Fryuro": "0-6-61", "1x1x1x1": "0-6-62", "Guest 666": "0-6-63", "Swag Soda": "0-6-64", "Capitano Moby": "0-6-65", "Orcaledon": "0-6-66", "W or L": "0-6-67", "Fishino Clownino": "0-6-68", "Cuadramat and Pakrahmatmamat": "0-6-69", "Los Planitos": "0-6-70", "Lavadorito Spinito": "0-6-71", "Boatito Auratito": "0-6-72", "Pirulitoita Bicicletera": "0-6-73", "Los Puggies": "0-6-74", "Los Spaghettis": "0-6-75", "Fragrama and Chocrama": "0-6-76", "Cooki and Milki": "0-6-77", "Gobblino Uniciclino": "0-6-78", "La Jolly Grande": "0-6-79", "Chicleteira Noelteira": "0-6-80", "Ho Ho Ho Sahur": "0-6-82", "La Vacca Prese Presente": "0-6-83", "List List List Sahur": "0-6-84", "Triplito Tralaleritos": "0-6-85", "Santa Hotspot": "0-6-86", "Naughty Naughty": "0-6-87", "Noo my Present": "0-6-88", "Los 25": "0-6-89", "Chimino": "0-6-90", "Los Candies": "0-6-91", "Festive 67": "0-6-92", "La Ginger Sekolah": "0-6-93", "Reinito Sleighito": "0-6-94", "Swaggy Bros": "0-6-95", "La Taco Combinasion": "0-6-96", "Bunnyman": "0-6-97", "Donkeyturbo Express": "0-6-98", "Money Money Reindeer": "0-6-99", "Dragon Gingerini": "0-6-100", "25": "0-6-101", "Los Jolly Combinasionas": "0-6-102", "Jolly Jolly Sahur": "0-6-103", "Ginger Gerat": "0-6-104", "Please my Present": "0-6-105", "Bunito Bunito Spinito": "0-6-106", "Tuff Toucan": "0-6-107", "Rocco Disco": "0-6-108", "Headless Horseman": "0-6-109", "Cerberus": "0-6-110", "Brunito Marsito": "0-6-111", "GOAT": "0-6-112", "Los Trios": "0-6-113", "Bacuru and Egguru": "0-6-114", "Chill Puppy": "0-6-115", "Spinny Hammy": "0-6-116", "Ketupat Bros": "0-6-117", "Hydra Dragon Cannelloni": "0-6-118", "Arcadopus": "0-6-119", "Mi Gatito": "0-6-120", "Los Mi Gatitos": "0-6-121", "Popcuru and Fizzuru": "0-6-122", "Celularcini Viciosini": "0-6-123", "Los Nooo My Hotspotsitos": "0-6-124", "Telemorte": "0-6-125", "Love Love Love Sahur": "0-6-126", "Cupid Hotspot": "0-6-127", "Noo my Heart": "0-6-128", "Chicleteira Cupideira": "0-6-129", "Rosetti Tualetti": "0-6-130", "Rosey and Teddy": "0-6-131", "La Romantic Grande": "0-6-132", "Lovin Rose": "0-6-133", "Los Burritos": "0-6-134", "La Food Combinasion": "0-6-135", "Los Amigos": "0-6-136", "Sammyni Fattini": "0-6-137", "Los Sekolahs": "0-6-138" },
+            "OG": { "Strawberry Elephant": "0-7-0", "Other": "0-7-1", "Meowl": "0-7-2", "Skibidi Toilet": "0-7-3" },
+            "Admin": { "Admin Lucky Block": "0-8-0", "Other": "0-8-1", "Los Lucky Block": "0-8-2" },
+            "Taco": { "Taco Lucky Block": "0-9-0", "Other": "0-9-1" },
+            "Festive": { "Festive Lucky Block": "0-10-0" },
+            "Valentines": { "Heart Lucky Block": "0-11-0", "Other": "0-11-1" }
+        };
+        const attributesDictionary = {
+            "Ms": ["0", "0-24 M/s", "25-49 M/s", "50-99 M/s", "100-249 M/s", "250-499 M/s", "500-749 M/s", "750-999 M/s", "1+ B/s"],
+            "Mutations": ["None", "Gold", "Diamond", "Bloodrot", "Candy", "Lava", "Galaxy", "Yin-Yang", "Radioactive", "Rainbow", "Cursed", "Divine"]
+        };
+        // ==========================================
+        // 页面初始化逻辑
+        // ==========================================
+        window.onload = function() {
+            // 1. 初始化 Rarity 下拉框
+            const raritySelect = document.getElementById("raritySelect");
+            for (let rarity in brainrotDictionary) {
+                let opt = document.createElement("option");
+                opt.value = rarity;
+                opt.innerHTML = rarity;
+                raritySelect.appendChild(opt);
+            }
+            // 2. 初始化 M/s 和 Mutations 下拉框
+            const msSelect = document.getElementById("msSelect");
+            attributesDictionary["Ms"].forEach(val => {
+                let opt = document.createElement("option");
+                opt.value = val;
+                opt.innerHTML = val;
+                msSelect.appendChild(opt);
+            });
+            const mutationSelect = document.getElementById("mutationSelect");
+            attributesDictionary["Mutations"].forEach(val => {
+                let opt = document.createElement("option");
+                opt.value = val;
+                opt.innerHTML = val;
+                mutationSelect.appendChild(opt);
+            });
+        }
+        // ==========================================
+        // 级联菜单核心逻辑
+        // ==========================================
+        function onRarityChange() {
+            const rarity = document.getElementById("raritySelect").value;
+            const itemSelect = document.getElementById("itemSelect");
+            // 清空旧数据
+            itemSelect.innerHTML = '<option value="">-- 请选择具体物品 --</option>';
+            if (rarity && brainrotDictionary[rarity]) {
+                const items = brainrotDictionary[rarity];
+                for (let itemName in items) {
+                    let opt = document.createElement("option");
+                    // option 的 value 直接存 environmentId (例如: 0-7-3)
+                    opt.value = items[itemName];
+                    opt.innerHTML = `${itemName}  (ID: ${items[itemName]})`;
+                    itemSelect.appendChild(opt);
+                }
+            }
+            updatePayloadPreview();
+        }
+        function updatePayloadPreview() {
+            const envId = document.getElementById("itemSelect").value;
+            const ms = document.getElementById("msSelect").value;
+            const mutation = document.getElementById("mutationSelect").value;
+            let previewText = `[实时预览] 准备查询的参数: \n`;
+            previewText += `TradeEnvironmentId: ${envId ? envId : '未选择'}\n`;
+            previewText += `M/s 属性过滤: ${ms ? ms : '不限'}\n`;
+            previewText += `Mutations 属性过滤: ${mutation ? mutation : '不限'}\n`;
+            logToOutput(previewText, false);
+        }
+        function logToOutput(text, append = true) {
+            const output = document.getElementById("output");
+            if (append) {
+                output.innerHTML += `\n${text}`;
+            } else {
+                output.innerHTML = text;
+            }
+            output.scrollTop = output.scrollHeight;
+        }
+        // ==========================================
+        // 发送 API 请求给后端
+        // ==========================================
+        async function checkMarketPrice() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const envId = document.getElementById("itemSelect").value;
+            const ms = document.getElementById("msSelect").value;
+            const mutation = document.getElementById("mutationSelect").value;
+            if (!username || !password) {
+                alert("请先填写账号密码！");
+                return;
+            }
+            if (!envId) {
+                alert("请先选择 Rarity 和 Item (必填项)");
+                return;
+            }
+            logToOutput(`\n⏳ 正在连接本地后端 (http://localhost:6675) 获取行情...`, false);
+            const payload = {
+                username: username,
+                password: password,
+                gameId: "259",
+                envId: envId,
+                targetMs: ms || "",
+                targetMutation: mutation || ""
+            };
+            try {
+                const response = await fetch('http://localhost:6675/api/v1/market-price', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    logToOutput(`\n✅ 查询成功！共找到 ${result.data.totalMatched} 个符合条件的在售商品。\n`);
+                    if (result.data.totalMatched > 0) {
+                        logToOutput(`💡 【建议定价】: $${result.data.suggestedPrice} USD (比最低价 $${result.data.lowestPrice} 便宜 1 美分)\n`);
+                        logToOutput(`🏆 【竞争对手 TOP 5】:`);
+                        result.data.topCompetitors.forEach((comp, idx) => {
+                            // 动态生成 Eldorado 的官方商品直接访问链接
+                            const itemUrl = `https://www.eldorado.gg/steal-a-brainrot-brainrots/oa/${comp.offerId}`;
+                            
+                            // 注入 HTML <a> 标签实现点击跳转
+                            logToOutput(`  #${idx + 1} | 💰 $${comp.price} | 👤 ${comp.seller} | 📦 ${comp.quantity} | ⏱️ ${comp.deliveryTime} | <a href="${itemUrl}" target="_blank" style="color: #00ffff; text-decoration: underline;">🔗 点击查看商品</a>`);
+                        });
+                    } else {
+                        logToOutput(`🌟 市场空白！你可以完全自由定价！`);
+                    }
+                } else {
+                    logToOutput(`\n❌ 查询失败: ${result.message}`);
+                }
+            } catch (error) {
+                logToOutput(`\n❌ 网络请求异常: ${error.message} \n请确保后端 Node.js (price_api_server.js) 正在运行！`);
+            }
+        }
+    </script>
+</body>
+</html>

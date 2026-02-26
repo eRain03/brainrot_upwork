@@ -1,0 +1,12 @@
+
+> backfrontend@0.0.0 dev
+> vite --port 6672
+
+
+  VITE v7.3.1  ready in 255 ms
+
+  ➜  Local:   http://localhost:6672/
+  ➜  Network: use --host to expose
+  ➜  Vue DevTools: Open http://localhost:6672/__devtools__/ as a separate window
+  ➜  Vue DevTools: Press Alt(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
+  ➜  press h + enter to show help

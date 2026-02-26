@@ -1,0 +1,18 @@
+INFO:     Will watch for changes in these directories: ['/home/tayen/work/Upwork/brainrot/brainrotBB']
+INFO:     Uvicorn running on http://0.0.0.0:6674 (Press CTRL+C to quit)
+INFO:     Started reloader process [271331] using WatchFiles
+INFO:     Started server process [271333]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:38652 - "GET / HTTP/1.1" 200 OK
+2026-02-26 14:10:45,965 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': None}
+2026-02-26 14:10:46,318 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-02-26 14:10:47,455 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-02-26 14:10:48,793 - INFO - Offer items detected.
+2026-02-26 14:10:51,126 - INFO - Returning 6 results.
+INFO:     127.0.0.1:54574 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [271333]
+INFO:     Stopping reloader process [271331]

@@ -1,0 +1,12 @@
+
+> frontend_client@0.0.0 dev
+> vite --port 6673
+
+
+  VITE v7.3.1  ready in 252 ms
+
+  ➜  Local:   http://localhost:6673/
+  ➜  Network: use --host to expose
+  ➜  Vue DevTools: Open http://localhost:6673/__devtools__/ as a separate window
+  ➜  Vue DevTools: Press Alt(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
+  ➜  press h + enter to show help

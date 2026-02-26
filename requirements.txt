@@ -1,0 +1,22 @@
+# Core Framework
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+
+# Launcher UI
+rich
+
+# Scraper & Network
+httpx
+requests
+beautifulsoup4
+playwright
+fake-useragent
+
+# Utils
+python-multipart
+python-dotenv
+passlib[bcrypt]
+tenacity
+cachetools
