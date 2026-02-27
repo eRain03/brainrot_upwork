@@ -16,6 +16,8 @@ const error = ref<string | null>(null);
 const marketLoading = ref(false);
 
 // Eldorado specific state
+const authMode = ref<'email' | 'cookie'>('email');
+const eldoCookie = ref('');
 const eldoEmail = ref('');
 const eldoPassword = ref('');
 const selectedCategory = ref('Brainrot God');
@@ -69,9 +71,13 @@ const executeManualSearch = () => {
 };
 
 const saveEldoCredentials = () => {
+  localStorage.setItem('eldo_auth_mode', authMode.value);
+  localStorage.setItem('eldo_cookie', eldoCookie.value);
   localStorage.setItem('eldo_email', eldoEmail.value);
   localStorage.setItem('eldo_password', eldoPassword.value);
 };
+watch(authMode, saveEldoCredentials);
+watch(eldoCookie, saveEldoCredentials);
 watch(eldoEmail, saveEldoCredentials);
 watch(eldoPassword, saveEldoCredentials);
 
@@ -269,6 +275,12 @@ onMounted(async () => {
   
   const savedPass = localStorage.getItem('eldo_password');
   if (savedPass) eldoPassword.value = savedPass;
+
+  const savedAuthMode = localStorage.getItem('eldo_auth_mode');
+  if (savedAuthMode) authMode.value = savedAuthMode as 'email' | 'cookie';
+  
+  const savedCookie = localStorage.getItem('eldo_cookie');
+  if (savedCookie) eldoCookie.value = savedCookie;
 
   // Check system dark mode preference or stored
   if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -484,8 +496,12 @@ const fetchMarketPrices = async (isManual = false) => {
 };
 
 const submitToEldorado = async () => {
-    if (!eldoEmail.value || !eldoPassword.value) {
+    if (authMode.value === 'email' && (!eldoEmail.value || !eldoPassword.value)) {
         alert("Please enter Eldorado Email and Password in the left panel.");
+        return;
+    }
+    if (authMode.value === 'cookie' && !eldoCookie.value) {
+        alert("Please enter Eldorado Cookie in the left panel.");
         return;
     }
     if (!selectedFile.value) {
@@ -514,8 +530,13 @@ const submitToEldorado = async () => {
     const tradeEnvId = brainrotDictionary[selectedCategory.value][selectedItem.value];
 
     const formData = new FormData();
-    formData.append('email', eldoEmail.value);
-    formData.append('password', eldoPassword.value);
+    formData.append('authMode', authMode.value);
+    if (authMode.value === 'email') {
+        formData.append('email', eldoEmail.value);
+        formData.append('password', eldoPassword.value);
+    } else {
+        formData.append('cookieStr', eldoCookie.value);
+    }
     formData.append('title', listing.value.title || 'Untitled');
     formData.append('description', descriptionTemplate);
     formData.append('price', listing.value.price.toString());
@@ -682,10 +703,27 @@ const exportCSV = () => {
 
       <!-- Eldorado Account Section -->
       <div class="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col gap-3 shrink-0 border border-black/10 dark:border-white/10">
-        <h3 class="text-sm font-bold text-black/80 dark:text-white/80 border-b border-black/10 dark:border-white/10 pb-2">Eldorado Account</h3>
-        <input v-model="eldoEmail" type="email" placeholder="Email" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary" disabled title="Contact admin to change bound email"/>
-        <input v-model="eldoPassword" type="password" placeholder="Password" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary" />
-        <p class="text-[10px] text-gray-500 italic mt-[-8px]">We do not save your login information and password. You must re-enter your password upon page refresh.</p>
+        <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2">
+            <h3 class="text-sm font-bold text-black/80 dark:text-white/80">Eldorado Account</h3>
+            <div class="flex gap-2">
+                <label class="text-xs flex items-center gap-1 cursor-pointer">
+                    <input type="radio" v-model="authMode" value="email" class="accent-primary" /> Email
+                </label>
+                <label class="text-xs flex items-center gap-1 cursor-pointer">
+                    <input type="radio" v-model="authMode" value="cookie" class="accent-primary" /> Cookie
+                </label>
+            </div>
+        </div>
+        
+        <template v-if="authMode === 'email'">
+            <input v-model="eldoEmail" type="email" placeholder="Email" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary" disabled title="Contact admin to change bound email"/>
+            <input v-model="eldoPassword" type="password" placeholder="Password" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary" />
+            <p class="text-[10px] text-gray-500 italic mt-[-8px]">We do not save your login information and password. You must re-enter your password upon page refresh.</p>
+        </template>
+        <template v-else>
+            <textarea v-model="eldoCookie" placeholder="Paste your cookie here..." class="w-full h-20 bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary resize-none"></textarea>
+            <p class="text-[10px] text-gray-500 italic mt-[-8px]">Your cookie will be saved locally.</p>
+        </template>
         
         <label class="block text-xs font-bold text-black/70 dark:text-white/70 mt-1">Category & Item</label>
         <select v-model="selectedCategory" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary">
@@ -699,6 +737,15 @@ const exportCSV = () => {
         <select v-model="selectedMsRate" class="w-full bg-white dark:bg-zinc-800 border-none rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:ring-2 focus:ring-primary">
           <option v-for="rate in msRates" :key="rate" :value="rate">{{ rate }}</option>
         </select>
+      </div>
+
+      <!-- Extension Download Section -->
+      <div class="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col gap-3 shrink-0 border border-black/10 dark:border-white/10 text-center">
+        <a href="/download/crx.zip" download="crx.zip" class="w-full bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-black dark:text-white font-bold py-2 rounded-xl transition-colors flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <span class="material-icons-round text-primary">extension</span>
+            Download Chrome Ext
+        </a>
+        <p class="text-[10px] text-gray-500 italic mt-[-4px] leading-tight">The extension code is completely open source, anyone can extract the zip file to verify the security of the content.</p>
       </div>
 
     </section>

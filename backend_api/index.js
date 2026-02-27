@@ -63,6 +63,11 @@ const msMapping = {
 
 // ================= Helper Functions =================
 
+function extractXsrfToken(cookieString) {
+  const match = cookieString.match(/__Host-XSRF-TOKEN=([^;]+)/);
+  return match ? match[1].trim() : null;
+}
+
 async function authenticate(username, password) {
     try {
         try {
@@ -86,7 +91,7 @@ async function authenticate(username, password) {
     }
 }
 
-async function uploadImageToEldorado(imagePath, fileName, idToken) {
+async function uploadImageToEldorado(imagePath, fileName, authData) {
     const uploadUrl = `https://${_eldorado_hostname}/api/files/me/Offer`;
 
     if (!fs.existsSync(imagePath)) {
@@ -100,12 +105,20 @@ async function uploadImageToEldorado(imagePath, fileName, idToken) {
 
     console.log(`[POST] 正在上传图片 ${fileName} 到 Eldorado CDN...`);
 
+    const headers = {
+        'swagger': 'Swager request'
+    };
+
+    if (authData.cookieStr) {
+        headers['Cookie'] = authData.cookieStr;
+        if (authData.xsrfToken) headers['X-XSRF-Token'] = authData.xsrfToken;
+    } else if (authData.idToken) {
+        headers['Cookie'] = `__Host-EldoradoIdToken=${authData.idToken}`;
+    }
+
     const response = await fetch(uploadUrl, {
         method: 'POST',
-        headers: {
-            'Cookie': `__Host-EldoradoIdToken=${idToken}`,
-            'swagger': 'Swager request'
-        },
+        headers: headers,
         body: formData
     });
 
@@ -132,19 +145,28 @@ async function uploadImageToEldorado(imagePath, fileName, idToken) {
     }
 }
 
-async function createOffer(payload, idToken) {
+async function createOffer(payload, authData) {
     const createPath = '/api/flexibleOffers/item';
     const url = `https://${_eldorado_hostname}${createPath}`;
 
     console.log(`[POST] 正在执行上架操作...`);
+    
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'swagger': 'Swager request'
+    };
+
+    if (authData.cookieStr) {
+        headers['Cookie'] = authData.cookieStr;
+        if (authData.xsrfToken) headers['X-XSRF-Token'] = authData.xsrfToken;
+    } else if (authData.idToken) {
+        headers['Cookie'] = `__Host-EldoradoIdToken=${authData.idToken}`;
+    }
+
     const response = await fetch(url, {
         method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Cookie': `__Host-EldoradoIdToken=${idToken}`,
-            'swagger': 'Swager request'
-        },
+        headers: headers,
         body: JSON.stringify(payload)
     });
 
@@ -165,6 +187,8 @@ app.post('/api/create-offer', upload.single('image'), async (req, res) => {
     
     // 1. 获取输入参数
     const { 
+        authMode,
+        cookieStr,
         email, 
         password, 
         title, 
@@ -178,19 +202,34 @@ app.post('/api/create-offer', upload.single('image'), async (req, res) => {
     const file = req.file;
 
     // 基本校验
-    if (!email || !password || !title || !price || !tradeEnvironmentId || !file) {
-        return res.status(400).json({ success: false, message: '缺少必要的参数，请检查(email, password, title, price, tradeEnvironmentId, image均必填)。' });
+    if (!title || !price || !tradeEnvironmentId || !file) {
+        return res.status(400).json({ success: false, message: '缺少必要的参数，请检查(title, price, tradeEnvironmentId, image均必填)。' });
+    }
+    if (authMode === 'cookie' && !cookieStr) {
+        return res.status(400).json({ success: false, message: 'Cookie 模式下缺少 Cookie。' });
+    }
+    if ((!authMode || authMode === 'email') && (!email || !password)) {
+        return res.status(400).json({ success: false, message: '邮箱密码模式下缺少账号密码。' });
     }
 
     try {
-        // 2. AWS 身份验证
-        console.log(`[1/4] 正在验证账号: ${email}...`);
-        const idToken = await authenticate(email, password);
-        console.log(`[1/4] ✅ 账号验证成功`);
+        let authData = {};
+        if (authMode === 'cookie') {
+            console.log(`[1/4] 使用 Cookie 模式验证...`);
+            authData.cookieStr = cookieStr.replace(/\r?\n|\r/g, '').trim();
+            authData.xsrfToken = extractXsrfToken(authData.cookieStr);
+            console.log(`[1/4] ✅ Cookie 解析完成`);
+        } else {
+            // 2. AWS 身份验证
+            console.log(`[1/4] 正在验证账号: ${email}...`);
+            const idToken = await authenticate(email, password);
+            authData.idToken = idToken;
+            console.log(`[1/4] ✅ 账号验证成功`);
+        }
 
         // 3. 上传图片
         console.log(`[2/4] 正在上传图片...`);
-        const formattedImageObject = await uploadImageToEldorado(file.path, file.originalname, idToken);
+        const formattedImageObject = await uploadImageToEldorado(file.path, file.originalname, authData);
         if (!formattedImageObject || !formattedImageObject.smallImage) {
             throw new Error("图片上传失败或返回格式无法解析");
         }
@@ -240,7 +279,7 @@ app.post('/api/create-offer', upload.single('image'), async (req, res) => {
 
         // 5. 发送上架请求
         console.log(`[4/4] 正在提交上架数据...`);
-        const createResponse = await createOffer(offerPayload, idToken);
+        const createResponse = await createOffer(offerPayload, authData);
         const createdOfferId = createResponse.id;
         console.log(`[4/4] ✅ 上架成功！商品 ID: ${createdOfferId}`);
 

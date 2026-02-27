@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Eldorado 授权提取器",
+  "name": "Eldorado Get Cookie",
   "version": "1.0",
-  "description": "一键提取 Eldorado 原生 Cookie",
+  "description": "Get Cookie",
   "permissions": [
     "cookies"
   ],

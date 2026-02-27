@@ -3,11 +3,15 @@ import time
 import sys
 import os
 import signal
-import select
-import tty
-import termios
 from urllib.request import urlopen, Request
 from urllib.error import URLError
+
+if sys.platform != 'win32':
+    import select
+    import tty
+    import termios
+else:
+    import msvcrt
 
 try:
     from rich.console import Console
@@ -37,14 +41,24 @@ def is_backend_healthy(url="http://localhost:6671/health", retries=10, delay=1):
 def start_process(command, cwd, log_name):
     """Starts a subprocess and redirects output to a log file."""
     log_file = open(log_name, "w")
-    process = subprocess.Popen(
-        command, 
-        cwd=cwd, 
-        shell=True, 
-        stdout=log_file, 
-        stderr=log_file,
-        preexec_fn=os.setsid # Create a new process group for easier cleanup
-    )
+    if sys.platform == 'win32':
+        process = subprocess.Popen(
+            command, 
+            cwd=cwd, 
+            shell=True, 
+            stdout=log_file, 
+            stderr=log_file,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+        )
+    else:
+        process = subprocess.Popen(
+            command, 
+            cwd=cwd, 
+            shell=True, 
+            stdout=log_file, 
+            stderr=log_file,
+            preexec_fn=os.setsid # Create a new process group for easier cleanup
+        )
     return process, log_file
 
 def print_log_tail(service_name, log_file, lines=25):
@@ -54,7 +68,7 @@ def print_log_tail(service_name, log_file, lines=25):
              console.print(f"[bold red]Log file not found:[/bold red] {log_file}")
              return
 
-        with open(log_file, 'r') as f:
+        with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
             # Read all lines (efficient enough for dev logs) and take the tail
             content = f.readlines()
             tail = content[-lines:]
@@ -82,7 +96,9 @@ def main():
     log_files = []
     
     # Save terminal settings to restore later
-    old_settings = termios.tcgetattr(sys.stdin)
+    old_settings = None
+    if sys.platform != 'win32':
+        old_settings = termios.tcgetattr(sys.stdin)
 
     try:
         with console.status("[bold cyan]Initializing services...[/bold cyan]") as status:
@@ -161,16 +177,26 @@ def main():
         console.print("\n[bold]Controls:[/bold] Press [bold yellow]1, 2, 3, 4, 5[/bold yellow] to view logs. Press [bold red]q[/bold red] or [bold red]Ctrl+C[/bold red] to exit.")
 
         # Set terminal to cbreak mode (read single keypress without enter)
-        tty.setcbreak(sys.stdin.fileno())
+        if sys.platform != 'win32':
+            tty.setcbreak(sys.stdin.fileno())
 
         while True:
-            # Non-blocking check for input
-            if select.select([sys.stdin], [], [], 0.1)[0]:
-                key = sys.stdin.read(1)
+            key = None
+            if sys.platform == 'win32':
+                if msvcrt.kbhit():
+                    key = msvcrt.getch().decode('utf-8', 'ignore')
+                else:
+                    time.sleep(0.1)
+            else:
+                # Non-blocking check for input
+                if select.select([sys.stdin], [], [], 0.1)[0]:
+                    key = sys.stdin.read(1)
                 
+            if key:
                 if key in ['1', '2', '3', '4', '5']:
                     # Temporarily restore terminal to normal to print nicely (handle newlines correctly)
-                    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+                    if sys.platform != 'win32':
+                        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
                     
                     console.print() # Spacer
                     if key == '1': print_log_tail("Backend API", "backend.log")
@@ -182,26 +208,34 @@ def main():
                     console.print("[dim]Press 1-5 again to view logs, q to quit...[/dim]")
                     
                     # Back to cbreak mode
-                    tty.setcbreak(sys.stdin.fileno())
+                    if sys.platform != 'win32':
+                        tty.setcbreak(sys.stdin.fileno())
 
                 elif key.lower() == 'q':
                     raise KeyboardInterrupt
 
     except KeyboardInterrupt:
         # Restore terminal settings immediately on exit attempt
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        if sys.platform != 'win32':
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
         console.print("\n[bold yellow]Shutting down services...[/bold yellow]")
     except Exception as e:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        if sys.platform != 'win32':
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
         console.print(f"\n[bold red]An error occurred: {e}[/bold red]")
     finally:
         # Restore terminal settings just in case
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        if sys.platform != 'win32':
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
         
         # Cleanup processes
         for p in processes:
             try:
-                os.killpg(os.getpgid(p.pid), signal.SIGTERM) # Kill the process group
+                if sys.platform == 'win32':
+                    p.send_signal(signal.CTRL_BREAK_EVENT)
+                    p.terminate()
+                else:
+                    os.killpg(os.getpgid(p.pid), signal.SIGTERM) # Kill the process group
             except Exception:
                 pass
         for f in log_files:

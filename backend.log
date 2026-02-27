@@ -1,42 +1,14 @@
 INFO:     Will watch for changes in these directories: ['/home/tayen/work/Upwork/brainrot/backend']
 INFO:     Uvicorn running on http://0.0.0.0:6671 (Press CTRL+C to quit)
-INFO:     Started reloader process [271262] using WatchFiles
-INFO:     Started server process [271264]
+INFO:     Started reloader process [107730] using WatchFiles
+INFO:     Started server process [107732]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     127.0.0.1:58504 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:40124 - "OPTIONS /admin/login HTTP/1.1" 200 OK
-INFO:     127.0.0.1:40124 - "POST /admin/login HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:40124 - "POST /admin/login HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:35026 - "POST /admin/login HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:35026 - "POST /admin/login HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:35026 - "POST /admin/login HTTP/1.1" 403 Forbidden
-INFO:     127.0.0.1:35270 - "POST /admin/login HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35270 - "OPTIONS /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35278 - "OPTIONS /admin/config HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35278 - "GET /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35270 - "GET /admin/config HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35278 - "OPTIONS /admin/llm-status HTTP/1.1" 200 OK
-INFO:     127.0.0.1:35278 - "GET /admin/llm-status HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "OPTIONS /admin/keys/5 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "DELETE /admin/keys/5 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "GET /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "OPTIONS /admin/keys/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "DELETE /admin/keys/4 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50816 - "GET /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:36188 - "OPTIONS /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:36188 - "POST /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:36188 - "GET /admin/keys HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56686 - "OPTIONS /me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56686 - "GET /me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56686 - "OPTIONS /bind-email HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56686 - "POST /bind-email HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54586 - "OPTIONS /analyze HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54586 - "POST /analyze HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54586 - "OPTIONS /market?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54586 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37452 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40284 - "OPTIONS /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40284 - "GET /me HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [271264]
-INFO:     Stopping reloader process [271262]
+INFO:     Finished server process [107732]
+INFO:     Stopping reloader process [107730]
