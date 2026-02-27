@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { width: 280px; padding: 15px; font-family: sans-serif; text-align: center; background: #f9f9f9; margin: 0; }
+    button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
+    button:hover { background: #0056b3; }
+    textarea { width: 100%; height: 80px; margin-top: 15px; display: none; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; padding: 5px; box-sizing: border-box; resize: none; }
+    #status { margin-top: 12px; font-size: 14px; font-weight: bold; color: #555; }
+  </style>
+</head>
+<body>
+  <button id="grabBtn">一键提取 Cookie</button>
+  <div id="status">请确保已在浏览器登录 Eldorado</div>
+  <textarea id="cookieResult" readonly></textarea>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

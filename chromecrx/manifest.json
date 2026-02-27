@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Eldorado 授权提取器",
+  "version": "1.0",
+  "description": "一键提取 Eldorado 原生 Cookie",
+  "permissions": [
+    "cookies"
+  ],
+  "host_permissions": [
+    "*://*.eldorado.gg/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
