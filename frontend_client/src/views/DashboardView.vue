@@ -33,7 +33,7 @@ const availableItems = computed(() => {
 watch(selectedCategory, () => {
   const items = availableItems.value;
   if (!items.includes(selectedItem.value)) {
-    selectedItem.value = items.length > 0 ? items[0] : '';
+    selectedItem.value = items.length > 0 ? (items[0] as string) : '';
   }
 });
 
@@ -52,7 +52,7 @@ const searchAvailableItems = computed(() => {
 watch(searchCategory, () => {
   const items = searchAvailableItems.value;
   if (!items.includes(searchItem.value)) {
-    searchItem.value = items.length > 0 ? items[0] : '';
+    searchItem.value = items.length > 0 ? (items[0] as string) : '';
   }
 });
 
@@ -173,8 +173,8 @@ const convertPrice = (amount: number, fromCurr: string, toCurr: string): number 
   // Convert to USD first (amount / rate_from), then to target ( * rate_to)
   // Formula: AmountInUSD = amount / rate[from]
   //          TargetAmount = AmountInUSD * rate[to]
-  const amountInUSD = amount / exchangeRates[fromCurr];
-  return amountInUSD * exchangeRates[toCurr];
+  const amountInUSD = amount / (exchangeRates[fromCurr] || 1.0);
+  return amountInUSD * (exchangeRates[toCurr] || 1.0);
 };
 
 const sortedMarketItems = computed(() => {
@@ -196,9 +196,19 @@ const sortedMarketItems = computed(() => {
     return {
       ...item,
       displayPrice,
-      isConverted: originalCurr !== targetCurrency.value
+      isConverted: originalCurr !== targetCurrency.value,
+      convertedVal: convertedVal // Keep the raw number for calculations
     };
   });
+});
+
+const lowestPrice = computed(() => {
+  if (sortedMarketItems.value.length === 0) return null;
+  // Reduce to find the minimum converted value
+  return sortedMarketItems.value.reduce((min, item) => 
+    item.convertedVal < min ? item.convertedVal : min, 
+    sortedMarketItems.value[0]?.convertedVal || 0
+  );
 });
 
 const toggleSort = () => {
@@ -495,6 +505,13 @@ const fetchMarketPrices = async (isManual = false) => {
     }
 };
 
+// Auto-sync market prices when left panel parameters change
+watch([selectedCategory, selectedItem, selectedMsRate, () => listing.value.mutation], () => {
+    if (apiKey.value) {
+        fetchMarketPrices(false);
+    }
+});
+
 const submitToEldorado = async () => {
     if (authMode.value === 'email' && (!eldoEmail.value || !eldoPassword.value)) {
         alert("Please enter Eldorado Email and Password in the left panel.");
@@ -527,7 +544,7 @@ const submitToEldorado = async () => {
     const descriptionTemplate = `High-value ${listing.value.mutation || ''} ${listing.value.title} with ${listing.value.traits_count} traits! ${emojis}\n\nPrice: $${listing.value.price}\nType: ${listing.value.brainrot_type}\n\nDM for more info! #Roblox #Brainrot`;
     generatedListing.value = descriptionTemplate;
 
-    const tradeEnvId = brainrotDictionary[selectedCategory.value][selectedItem.value];
+    const tradeEnvId = brainrotDictionary[selectedCategory.value]?.[selectedItem.value] || '';
 
     const formData = new FormData();
     formData.append('authMode', authMode.value);
@@ -662,7 +679,13 @@ const exportCSV = () => {
       <button class="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-colors" @click="isDark = !isDark">
         <span class="material-icons-round text-black dark:text-white">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
       </button>
-      <button @click="router.push('/settings')" class="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+      <button @click="router.push('/batch')" class="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-colors" title="Batch Upload">
+        <span class="material-icons-round text-3xl text-black dark:text-white">library_add</span>
+      </button>
+      <button @click="router.push('/listings')" class="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-colors" title="My Listings">
+        <span class="material-icons-round text-3xl text-black dark:text-white">inventory_2</span>
+      </button>
+      <button @click="router.push('/settings')" class="p-2 rounded-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-colors" title="Settings">
         <span class="material-icons-round text-3xl text-black dark:text-white">settings</span>
       </button>
     </div>
@@ -801,7 +824,17 @@ const exportCSV = () => {
             <textarea v-model="listing.check_title" class="w-full h-24 bg-white dark:bg-surface-dark border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-900 dark:text-gray-100 focus:ring-primary focus:border-primary resize-none font-medium text-lg" placeholder="Edit here if mistakes found in AI analysis..."></textarea>
           </div>
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-bold text-gray-500 dark:text-gray-400">Set Your Price</label>
+            <div class="flex items-center justify-between">
+                <label class="text-sm font-bold text-gray-500 dark:text-gray-400">Set Your Price</label>
+                <div class="flex gap-2" v-if="lowestPrice !== null && targetCurrency === 'USD'">
+                    <button @click="listing.price = Math.max(0, lowestPrice - 5)" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-1 rounded font-bold transition-colors">
+                        - $5 from Lowest
+                    </button>
+                    <button @click="listing.price = lowestPrice + 5" class="text-xs bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 px-2 py-1 rounded font-bold transition-colors">
+                        + $5 from Lowest
+                    </button>
+                </div>
+            </div>
             <div class="relative">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
               <input v-model="listing.price" class="w-full bg-white dark:bg-surface-dark border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-4 text-3xl font-bold text-gray-900 dark:text-white focus:ring-primary focus:border-primary placeholder-gray-300 dark:placeholder-gray-600" placeholder="0.00" type="number"/>

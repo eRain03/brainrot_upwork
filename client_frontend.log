@@ -3,10 +3,47 @@
 > vite --port 6673
 
 
-  VITE v7.3.1  ready in 256 ms
+  VITE v7.3.1  ready in 313 ms
 
   ➜  Local:   http://localhost:6673/
   ➜  Network: use --host to expose
   ➜  Vue DevTools: Open http://localhost:6673/__devtools__/ as a separate window
   ➜  Vue DevTools: Press Alt(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
   ➜  press h + enter to show help
+20:56:37 [vite] (client) page reload src/router/index.ts
+20:56:38 [vite] (client) Pre-transform error: Failed to resolve import "../views/BatchUploadView.vue" from "src/router/index.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/tayen/work/Upwork/brainrot/frontend_client/src/router/index.ts:5:28
+  3  |  import SettingsView from "../views/SettingsView.vue";
+  4  |  import ListingsView from "../views/ListingsView.vue";
+  5  |  import BatchUploadView from "../views/BatchUploadView.vue";
+     |                               ^
+  6  |  const router = createRouter({
+  7  |    history: createWebHistory(import.meta.env.BASE_URL),
+20:56:38 [vite] Internal server error: Failed to resolve import "../views/BatchUploadView.vue" from "src/router/index.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/tayen/work/Upwork/brainrot/frontend_client/src/router/index.ts:5:28
+  3  |  import SettingsView from "../views/SettingsView.vue";
+  4  |  import ListingsView from "../views/ListingsView.vue";
+  5  |  import BatchUploadView from "../views/BatchUploadView.vue";
+     |                               ^
+  6  |  const router = createRouter({
+  7  |    history: createWebHistory(import.meta.env.BASE_URL),
+      at TransformPluginContext._formatLog (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:28999:43)
+      at TransformPluginContext.error (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:28996:14)
+      at normalizeUrl (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:27119:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:27177:32
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:27145:4)
+      at async file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.BzUKaD4x.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:28797:14)
+      at async loadAndTransform (file:///home/tayen/work/Upwork/brainrot/frontend_client/node_modules/vite/dist/node/chunks/config.js:22670:26)
+20:57:59 [vite] (client) page reload src/views/BatchUploadView.vue
+20:58:16 [vite] (client) hmr update /src/views/DashboardView.vue, /src/assets/main.css
+21:09:06 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css
+21:09:35 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css
+21:09:46 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css
+21:09:58 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css
+21:12:05 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css
+21:21:57 [vite] (client) hmr update /src/views/BatchUploadView.vue, /src/assets/main.css

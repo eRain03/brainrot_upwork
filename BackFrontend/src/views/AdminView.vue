@@ -19,6 +19,9 @@ const newDays = ref<number | null>(30);
 const loading = ref(false);
 
 const llmKey = ref('');
+const llmBaseUrl = ref('');
+const llmModel = ref('');
+const systemPrompt = ref('');
 const llmStatus = ref('');
 const llmLoading = ref(false);
 
@@ -62,6 +65,54 @@ const fetchConfig = async () => {
             const configs = await res.json();
             const llm = configs.find((c: any) => c.key === 'LLM_API_KEY');
             if (llm) llmKey.value = llm.value;
+
+            const baseUrl = configs.find((c: any) => c.key === 'LLM_BASE_URL');
+            if (baseUrl) llmBaseUrl.value = baseUrl.value;
+
+            const model = configs.find((c: any) => c.key === 'LLM_MODEL');
+            if (model) llmModel.value = model.value;
+
+            const prompt = configs.find((c: any) => c.key === 'SYSTEM_PROMPT');
+            if (prompt && prompt.value) {
+                systemPrompt.value = prompt.value;
+            } else {
+                systemPrompt.value = `You are an AI assistant for the game 'Steal a Brainrot'. 
+Your task is to analyze a screenshot of a game item listing or inventory.
+Extract the following information and return it in valid JSON format.
+
+Crucial: You must generate a 'title' that strictly follows the marketing format below, AND a 'clean_name' for searching.
+
+**Title Format Rules:**
+1. Start with a relevant emoji (e.g., 🌋 for Lava, 🌈 for Rainbow, 🚽 for generic).
+2. Follow with: "{Mutation} {Traits Count} Trait {Item Name} (OG/Variant if visible)".
+3. Add a fire emoji 🔥 and then the stats if visible (e.g., "4.4B/s").
+4. Add "(RARE SECRET)" or similar rarity tags if applicable.
+5. ALWAYS Append: "| (💸 CHEAPEST | 📦 FAST DELIVERY)"
+6. IF the item is "Free Brainrot" (look for "Free" tag or price 0), APPEND this specific suffix:
+   "| Steal A Brainrot | COMES WITH FREE BRAINROT 🆓"
+
+**Clean Name Rules (For Search):**
+- MUST BE EXTREMELY SHORT AND PRECISE for market search.
+- ONLY include the Mutation (if any) and the base Item Name.
+- DO NOT include trait counts (like "26"), "OG", stats, emojis, or marketing fluff.
+- Example: "Lava Skibidi Toilet" or "Rainbow Camera Man"
+
+**Examples:**
+- Non-Free Item Title: "🌋 Lava 1 Trait Skibidi Toilet (OG) 🔥 4.4B/s (RARE SECRET) | (💸 CHEAPEST | 📦 FAST DELIVERY)"
+- Free Item Title: "🌈 Rainbow 2 Trait Camera Man 🔥 1.2B/s | (💸 CHEAPEST | 📦 FAST DELIVERY) | Steal A Brainrot | COMES WITH FREE BRAINROT 🆓"
+
+**Fields to Extract:**
+1. title: The formatted marketing string as defined above.
+2. clean_name: The clean item name for searching market prices (e.g. "Lava Skibidi Toilet").
+3. mutation: The mutation name (e.g., "Rainbow", "Lava"). Null if none.
+4. traits_count: The integer number of traits.
+5. brainrot_type: "Free" or "Non-free".
+6. price_suggestion: A rough integer estimate (e.g. 500). 0 if Free.
+7. item_name: The base item name WITHOUT mutations or OG tags, exactly as it might appear in a dictionary (e.g. "Skibidi Toilet", "Cocofanto Elefanto").
+8. ms_rate: The M/s or B/s rate as a string exactly as shown on the image (e.g. "4.4B/s", "150M/s"). Null if none.
+
+Return ONLY the JSON object. Do not include markdown code blocks.`;
+            }
         }
         await checkLlmStatus();
     } catch(e) {
@@ -86,15 +137,42 @@ const checkLlmStatus = async () => {
 
 const saveLlmConfig = async () => {
     try {
-        const res = await apiFetch(`${CONFIG_URL}/LLM_API_KEY`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value: llmKey.value })
-        });
-        if (res.ok) {
-            alert('LLM Config Saved');
-            checkLlmStatus();
+        const promises = [
+            apiFetch(`${CONFIG_URL}/LLM_API_KEY`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value: llmKey.value })
+            })
+        ];
+
+        if (llmBaseUrl.value !== null) {
+            promises.push(apiFetch(`${CONFIG_URL}/LLM_BASE_URL`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value: llmBaseUrl.value })
+            }));
         }
+
+        if (llmModel.value !== null) {
+            promises.push(apiFetch(`${CONFIG_URL}/LLM_MODEL`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value: llmModel.value })
+            }));
+        }
+
+        if (systemPrompt.value !== null) {
+            promises.push(apiFetch(`${CONFIG_URL}/SYSTEM_PROMPT`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value: systemPrompt.value })
+            }));
+        }
+
+        await Promise.all(promises);
+        
+        alert('LLM Config Saved');
+        checkLlmStatus();
     } catch(e) {
         console.error(e);
     }
@@ -252,13 +330,24 @@ onMounted(() => {
                         {{ llmLoading ? 'Checking connection...' : llmStatus }}
                     </span>
                 </div>
-                <div class="flex-1 flex flex-col justify-center">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">API Key (iFlow / OpenAI Compatible)</label>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input v-model="llmKey" type="text" class="flex-1 rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 font-mono text-sm transition-shadow" placeholder="sk-...">
-                        <button @click="saveLlmConfig" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-colors whitespace-nowrap">Save & Test</button>
+                <div class="flex-1 flex flex-col gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">API Base URL (OpenAI Compatible)</label>
+                        <input v-model="llmBaseUrl" type="text" class="w-full rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 font-mono text-sm transition-shadow" placeholder="https://apis.iflow.cn/v1">
                     </div>
-                    <p class="text-xs text-gray-500 mt-3">Used for analyzing images via <span class="font-mono bg-gray-100 px-1 rounded text-gray-600">qwen3-vl-plus</span>.</p>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Model Name</label>
+                        <input v-model="llmModel" type="text" class="w-full rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 font-mono text-sm transition-shadow" placeholder="qwen3-vl-plus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">API Key</label>
+                        <input v-model="llmKey" type="text" class="w-full rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 font-mono text-sm transition-shadow" placeholder="sk-...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">System Prompt</label>
+                        <textarea v-model="systemPrompt" rows="12" class="w-full rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 font-mono text-sm transition-shadow" placeholder="Enter system prompt here..."></textarea>
+                    </div>
+                    <button @click="saveLlmConfig" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-colors mt-2">Save All Configurations</button>
                 </div>
             </div>
 

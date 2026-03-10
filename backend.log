@@ -1,14 +1,145 @@
 INFO:     Will watch for changes in these directories: ['/home/tayen/work/Upwork/brainrot/backend']
 INFO:     Uvicorn running on http://0.0.0.0:6671 (Press CTRL+C to quit)
-INFO:     Started reloader process [107730] using WatchFiles
-INFO:     Started server process [107732]
+INFO:     Started reloader process [23475] using WatchFiles
+INFO:     Started server process [23477]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     127.0.0.1:37452 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:40284 - "OPTIONS /me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:40284 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40722 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40738 - "GET /me HTTP/1.1" 200 OK
+Error calling AI API: 'choices'
+INFO:     127.0.0.1:46120 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46120 - "GET /market?category=Brainrot+God HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53408 - "GET /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53400 - "GET /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53400 - "OPTIONS /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53400 - "GET /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39668 - "PUT /admin/config/SYSTEM_PROMPT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39686 - "PUT /admin/config/LLM_BASE_URL HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39674 - "PUT /admin/config/LLM_MODEL HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39666 - "PUT /admin/config/LLM_API_KEY HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39668 - "GET /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59336 - "PUT /admin/config/LLM_BASE_URL HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "PUT /admin/config/LLM_API_KEY HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59350 - "PUT /admin/config/LLM_MODEL HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59362 - "PUT /admin/config/SYSTEM_PROMPT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59362 - "GET /admin/llm-status HTTP/1.1" 200 OK
+Error calling AI API: Client error '400 Bad Request' for url 'https://api.openai.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+INFO:     127.0.0.1:59362 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47014 - "GET /me HTTP/1.1" 200 OK
+Error calling AI API: Client error '400 Bad Request' for url 'https://api.openai.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+INFO:     127.0.0.1:47014 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47014 - "OPTIONS /market?category=Brainrot+God HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47014 - "GET /market?category=Brainrot+God HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'ai_service.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [107732]
-INFO:     Stopping reloader process [107730]
+INFO:     Finished server process [23477]
+INFO:     Started server process [26241]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:49516 - "POST /analyze HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/applications.py", line 1138, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/routing.py", line 115, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/routing.py", line 101, in app
+    response = await f(request)
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/routing.py", line 355, in app
+    raw_response = await run_endpoint_function(
+  File "/home/tayen/.pyenv/versions/3.10.14/lib/python3.10/site-packages/fastapi/routing.py", line 243, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/tayen/work/Upwork/brainrot/backend/main.py", line 107, in analyze_image
+    if not file.content_type.startswith("image/"):
+AttributeError: 'NoneType' object has no attribute 'startswith'
+AI API Error Response: {
+  "error": {
+    "message": "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.",
+    "type": "invalid_request_error",
+    "param": "max_tokens",
+    "code": "unsupported_parameter"
+  }
+}
+Error calling AI API: Client error '400 Bad Request' for url 'https://api.openai.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+INFO:     127.0.0.1:36762 - "POST /analyze HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'ai_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26241]
+INFO:     Started server process [26908]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:36880 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "OPTIONS /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "OPTIONS /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "OPTIONS /market?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39086 - "OPTIONS /market?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39086 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "OPTIONS /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38612 - "OPTIONS /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38612 - "GET /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39078 - "GET /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38612 - "OPTIONS /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38612 - "GET /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48358 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54210 - "GET /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54222 - "GET /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54222 - "GET /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54210 - "GET /market?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57234 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33722 - "OPTIONS /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33722 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33488 - "OPTIONS /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33490 - "OPTIONS /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33490 - "GET /admin/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33488 - "GET /admin/keys HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33490 - "OPTIONS /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33490 - "GET /admin/llm-status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46392 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46392 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46392 - "GET /me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32926 - "OPTIONS /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32926 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58154 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44012 - "POST /analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44002 - "POST /analyze HTTP/1.1" 200 OK

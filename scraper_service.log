@@ -1,12 +1,55 @@
 INFO:     Will watch for changes in these directories: ['/home/tayen/work/Upwork/brainrot/brainrotBB']
 INFO:     Uvicorn running on http://0.0.0.0:6674 (Press CTRL+C to quit)
-INFO:     Started reloader process [107813] using WatchFiles
-INFO:     Started server process [107815]
+INFO:     Started reloader process [23584] using WatchFiles
+INFO:     Started server process [23587]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     127.0.0.1:50614 - "GET / HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [107815]
-INFO:     Stopping reloader process [107813]
+INFO:     127.0.0.1:46924 - "GET / HTTP/1.1" 200 OK
+2026-03-09 20:41:20,017 - INFO - Received search request for filters: {'ms_rate': None, 'mutations': None, 'category': 'Brainrot God', 'item_name': None}
+2026-03-09 20:41:20,366 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:41:22,047 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:41:23,948 - INFO - Offer items detected.
+2026-03-09 20:41:26,565 - INFO - Returning 24 results.
+INFO:     127.0.0.1:40218 - "GET /search?category=Brainrot+God HTTP/1.1" 200 OK
+2026-03-09 20:42:24,649 - INFO - Received search request for filters: {'ms_rate': None, 'mutations': None, 'category': 'Brainrot God', 'item_name': None}
+2026-03-09 20:42:24,978 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:42:26,736 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:42:29,215 - INFO - Offer items detected.
+2026-03-09 20:42:31,781 - INFO - Returning 24 results.
+INFO:     127.0.0.1:54634 - "GET /search?category=Brainrot+God HTTP/1.1" 200 OK
+2026-03-09 20:42:32,428 - INFO - Received search request for filters: {'ms_rate': None, 'mutations': None, 'category': 'Brainrot God', 'item_name': None}
+2026-03-09 20:42:32,751 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:42:34,582 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?te_v0=Brainrot&te_v1=Brainrot+God&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:42:37,066 - INFO - Offer items detected.
+2026-03-09 20:42:39,599 - INFO - Returning 24 results.
+INFO:     127.0.0.1:45006 - "GET /search?category=Brainrot+God HTTP/1.1" 200 OK
+2026-03-09 20:52:08,356 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': None}
+2026-03-09 20:52:08,376 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': 'Skibidi Toilet'}
+2026-03-09 20:52:08,717 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:08,739 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:10,452 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:10,592 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:12,383 - INFO - Offer items detected.
+2026-03-09 20:52:13,092 - INFO - Offer items detected.
+2026-03-09 20:52:14,897 - INFO - Returning 18 results.
+INFO:     127.0.0.1:51332 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+2026-03-09 20:52:14,928 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': None}
+2026-03-09 20:52:15,517 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:15,647 - INFO - Returning 4 results.
+INFO:     127.0.0.1:51348 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+2026-03-09 20:52:17,184 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:19,252 - INFO - Offer items detected.
+2026-03-09 20:52:21,820 - INFO - Returning 18 results.
+INFO:     127.0.0.1:44518 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG HTTP/1.1" 200 OK
+2026-03-09 20:52:34,228 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': 'Skibidi Toilet'}
+2026-03-09 20:52:34,563 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:36,409 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:52:38,322 - INFO - Offer items detected.
+2026-03-09 20:52:40,796 - INFO - Returning 4 results.
+INFO:     127.0.0.1:59146 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK
+2026-03-09 20:53:00,028 - INFO - Received search request for filters: {'ms_rate': '1-plus-bs', 'mutations': 'lava', 'category': 'OG', 'item_name': 'Skibidi Toilet'}
+2026-03-09 20:53:00,379 - INFO - Navigating to: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:53:01,992 - INFO - Page loaded. URL: https://www.eldorado.gg/steal-a-brainrot-brainrots/i/259?steal-a-brainrot-ms=1-plus-bs&steal-a-brainrot-mutations=lava&te_v0=Brainrot&te_v1=OG&te_v2=Skibidi+Toilet&gamePageOfferIndex=1&gamePageOfferSize=24
+2026-03-09 20:53:04,440 - INFO - Offer items detected.
+2026-03-09 20:53:06,886 - INFO - Returning 4 results.
+INFO:     127.0.0.1:43332 - "GET /search?ms_rate=1-plus-bs&mutations=lava&category=OG&item_name=Skibidi+Toilet HTTP/1.1" 200 OK

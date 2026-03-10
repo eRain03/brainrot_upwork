@@ -4,10 +4,7 @@ import os
 import json
 from typing import Optional
 
-BASE_URL = "https://apis.iflow.cn/v1"
-MODEL_NAME = "qwen3-vl-plus"
-
-async def analyze_image_with_ai(image_bytes: bytes, api_key: str) -> dict:
+async def analyze_image_with_ai(image_bytes: bytes, api_key: str, base_url: str = "https://apis.iflow.cn/v1", model_name: str = "qwen3-vl-plus", custom_prompt: Optional[str] = None) -> dict:
     """
     Analyzes an image using the Qwen-VL-Plus model via OpenAI-compatible API.
     Returns a JSON object with:
@@ -27,7 +24,7 @@ async def analyze_image_with_ai(image_bytes: bytes, api_key: str) -> dict:
         "Content-Type": "application/json"
     }
 
-    prompt = """
+    default_prompt = """
     You are an AI assistant for the game 'Steal a Brainrot'. 
     Your task is to analyze a screenshot of a game item listing or inventory.
     Extract the following information and return it in valid JSON format.
@@ -65,9 +62,11 @@ async def analyze_image_with_ai(image_bytes: bytes, api_key: str) -> dict:
 
     Return ONLY the JSON object. Do not include markdown code blocks.
     """
+    
+    prompt = custom_prompt if custom_prompt else default_prompt
 
     payload = {
-        "model": MODEL_NAME,
+        "model": model_name,
         "messages": [
             {
                 "role": "user",
@@ -84,13 +83,14 @@ async def analyze_image_with_ai(image_bytes: bytes, api_key: str) -> dict:
                     }
                 ]
             }
-        ],
-        "max_tokens": 1000
+        ]
     }
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
-            response = await client.post(f"{BASE_URL}/chat/completions", headers=headers, json=payload)
+            response = await client.post(f"{base_url}/chat/completions", headers=headers, json=payload)
+            if response.status_code != 200:
+                print(f"AI API Error Response: {response.text}")
             response.raise_for_status()
             result = response.json()
             

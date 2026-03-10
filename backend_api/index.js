@@ -310,6 +310,57 @@ app.post('/api/create-offer', upload.single('image'), async (req, res) => {
     }
 });
 
+app.post('/api/listings/state-count', async (req, res) => {
+    const { authMode, email, password, cookieStr } = req.body;
+    
+    if (authMode === 'cookie' && !cookieStr) {
+        return res.status(400).json({ success: false, message: 'Cookie 模式下缺少 Cookie。' });
+    }
+    if ((!authMode || authMode === 'email') && (!email || !password)) {
+        return res.status(400).json({ success: false, message: '邮箱密码模式下缺少账号密码。' });
+    }
+
+    try {
+        let authData = {};
+        if (authMode === 'cookie') {
+            authData.cookieStr = cookieStr.replace(/\r?\n|\r/g, '').trim();
+            authData.xsrfToken = extractXsrfToken(authData.cookieStr);
+        } else {
+            const idToken = await authenticate(email, password);
+            authData.idToken = idToken;
+        }
+
+        const url = `https://${_eldorado_hostname}/api/predefinedOffersUser/me/stateCount?category=Currency`;
+        const headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'swagger': 'Swager request'
+        };
+
+        if (authData.cookieStr) {
+            headers['Cookie'] = authData.cookieStr;
+            if (authData.xsrfToken) headers['X-XSRF-Token'] = authData.xsrfToken;
+        } else if (authData.idToken) {
+            headers['Cookie'] = `__Host-EldoradoIdToken=${authData.idToken}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+        const responseText = await response.text();
+        if (response.ok) {
+            res.json({ success: true, data: responseText ? JSON.parse(responseText) : {} });
+        } else {
+            throw new Error(`[GET] 获取状态失败. 状态码: ${response.status}, 响应: ${responseText}`);
+        }
+    } catch (error) {
+        console.error('❌ 获取商品状态失败:', error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

@@ -112,8 +112,16 @@ async def analyze_image(
     if not llm_key:
         raise HTTPException(status_code=500, detail="LLM API key not configured")
 
+    base_url_entry = db.query(Config).filter(Config.key == 'LLM_BASE_URL').first()
+    model_entry = db.query(Config).filter(Config.key == 'LLM_MODEL').first()
+    prompt_entry = db.query(Config).filter(Config.key == 'SYSTEM_PROMPT').first()
+
+    base_url = base_url_entry.value if base_url_entry else "https://apis.iflow.cn/v1"
+    model = model_entry.value if model_entry else "qwen3-vl-plus"
+    prompt = prompt_entry.value if prompt_entry else None
+
     contents = await file.read()
-    result = await analyze_image_with_ai(contents, llm_key)
+    result = await analyze_image_with_ai(contents, llm_key, base_url, model, prompt)
     return result
 
 # Client Endpoint: Market Prices
@@ -236,13 +244,16 @@ async def check_llm_status(db: Session = Depends(get_db), _admin: bool = Depends
     llm_key = config_entry.value if config_entry else ""
     if not llm_key:
         return {"status": "error", "message": "API Key not configured"}
+
+    base_url_entry = db.query(Config).filter(Config.key == 'LLM_BASE_URL').first()
+    base_url = base_url_entry.value if base_url_entry else "https://apis.iflow.cn/v1"
         
     # Simple verification by listing models or making a very small request.
     # iFlow / OpenAI compatible:
     headers = {"Authorization": f"Bearer {llm_key}"}
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get("https://apis.iflow.cn/v1/models", headers=headers)
+            resp = await client.get(f"{base_url}/models", headers=headers)
             if resp.status_code == 200:
                 return {"status": "ok", "message": "Connected successfully"}
             else:
